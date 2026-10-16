@@ -1,11 +1,77 @@
-<!doctype html>
-<html>
-  <head>
-    <title>My First Website</title>
-  </head>
-  <body>
-    <h1>Hello World!</h1>
-    <p>This is my very first website.</p>
-	<p>And here we go again... </p>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My First D3 Bar Chart</title>
+
+  <!-- Load D3 from a CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<body>
+
+  <svg id="chart"></svg>
+
+  <script>
+    const data = [
+      { name: "A", value: 1 },
+      { name: "B", value: 5 },
+      { name: "C", value: 8 },
+      { name: "D", value: 10 }
+    ];
+
+    const width = 500;
+    const height = 300;
+    const margin = {
+      top: 20,
+      right: 20,
+      bottom: 40,
+      left: 40
+    };
+
+    const svg = d3
+      .select("#chart")
+      .attr("width", width)
+      .attr("height", height);
+
+    // X scale: categories A, B, C, D
+    const x = d3
+      .scaleBand()
+      .domain(data.map(d => d.name))
+      .range([margin.left, width - margin.right])
+      .padding(0.2);
+
+    // Y scale: values 0 to 10
+    const y = d3
+      .scaleLinear()
+      .domain([0, d3.max(data, d => d.value)])
+      .nice()
+      .range([height - margin.bottom, margin.top]);
+
+    // Draw bars
+    svg
+      .selectAll("rect")
+      .data(data)
+      .join("rect")
+      .attr("x", d => x(d.name))
+      .attr("y", d => y(d.value))
+      .attr("width", x.bandwidth())
+      .attr("height", d => y(0) - y(d.value))
+      .attr("fill", "steelblue");
+
+    // X axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .call(d3.axisBottom(x));
+
+    // Y axis
+    svg
+      .append("g")
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .call(d3.axisLeft(y));
+
+  </script>
+
+</body>
 </html>
